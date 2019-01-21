@@ -5,6 +5,7 @@ Console* g_pConsole = new Console();
 
 auto Console::Init() -> void
 {
+	SetConsoleTitle(_T("Age of Empires II: HD Edition - Trainer"));
 	Resize();
 	PrintInfo();
 }

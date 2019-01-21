@@ -25,7 +25,7 @@ auto Memory::Init() -> bool
 
 		if (strcmp(pe32.szExeFile, "AoK HD.exe") == 0) {
 						
-			m_dwPID = reinterpret_cast<DWORD>(pe32.th32ProcessID);
+			m_dwPID = pe32.th32ProcessID;
 
 			MODULEENTRY32 me32;
 
