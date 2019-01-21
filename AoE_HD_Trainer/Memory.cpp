@@ -8,8 +8,8 @@ using namespace std;
 
 Memory* g_pAOEMemory = new Memory();
 
-
-bool Memory::Init() {
+auto Memory::Init() -> bool
+{
 	
 	HANDLE processSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	PROCESSENTRY32 pe32;
@@ -25,7 +25,7 @@ bool Memory::Init() {
 
 		if (strcmp(pe32.szExeFile, "AoK HD.exe") == 0) {
 						
-			m_dwPID = (DWORD)pe32.th32ProcessID;
+			m_dwPID = reinterpret_cast<DWORD>(pe32.th32ProcessID);
 
 			MODULEENTRY32 me32;
 
@@ -43,7 +43,7 @@ bool Memory::Init() {
 			Module32First(hModuleSnap, &me32);
 			do {
 				if (strcmp(me32.szModule, "AoK HD.exe") == 0) {
-					m_dwBaseAddr = (DWORD)me32.modBaseAddr;
+					m_dwBaseAddr = reinterpret_cast<DWORD>(me32.modBaseAddr);
 					CloseHandle(hModuleSnap);
 				}
 			} while (Module32Next(hModuleSnap, &me32));
@@ -54,11 +54,12 @@ bool Memory::Init() {
 
 	} while (Process32Next(processSnap, &pe32));
 
-	return TRUE;
+	return true;
 }
 
 
-bool Memory::Read(DWORD dwAddress, LPVOID lpBuffer, DWORD dwSize) {
+auto Memory::Read(DWORD dwAddress, LPVOID lpBuffer, DWORD dwSize) -> bool
+{
 	HANDLE proc = OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_dwPID);
 	SIZE_T temp;
 	if (ReadProcessMemory(proc, (LPCVOID)dwAddress, lpBuffer, dwSize, &temp)) {
@@ -69,7 +70,8 @@ bool Memory::Read(DWORD dwAddress, LPVOID lpBuffer, DWORD dwSize) {
 	return false;
 }
 
-bool Memory::Write(DWORD dwAddress, LPCVOID lpBuffer, DWORD dwSize) {
+auto Memory::Write(DWORD dwAddress, LPCVOID lpBuffer, DWORD dwSize) -> bool
+{
 	HANDLE proc = OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_dwPID);
 	if (WriteProcessMemory(proc, (LPCVOID*)dwAddress, lpBuffer, dwSize, NULL)) {
 		CloseHandle(proc);
@@ -79,10 +81,7 @@ bool Memory::Write(DWORD dwAddress, LPCVOID lpBuffer, DWORD dwSize) {
 	return false;
 }
 
-bool Memory::IsRunning() {
-	HWND hwnd;
-	hwnd = FindWindow(NULL, "Age of Empires II: HD Edition");
-	bool ret = hwnd != NULL;
-	return ret;
-
+auto Memory::IsRunning() -> bool
+{
+	return FindWindow(NULL, "Age of Empires II: HD Edition") != NULL;
 }
